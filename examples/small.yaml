@@ -1,0 +1,41 @@
+entrypoint: Shell
+
+# "Shell" is both the name of component class and its element
+Shell:
+  template:
+    - Screen1:
+        # nestingLevel indicates how many levels deep a node should appear
+        nestingLevel: 3
+        # whether the node is guarded by a conditional
+        branch: if
+        # the number of property bindings on this node
+        props: 3
+    - Screen2:
+        nestingLevel: 3
+        branch: if
+        props: 1
+
+Screen1:
+  template:
+    # if node name begins with a capital letter, it's a nested component
+    - ScreenHeader:
+        props: 5
+    # if node name begins with a small letter, it's a plain HTML element
+    - div:
+        # how many times to repeat this node
+        repeat: 20
+
+Screen2:
+  template:
+    - ScreenHeader:
+        props: 5
+    - div:
+        nestingLevel: 3
+        branch:
+          repeat: 10
+
+ScreenHeader:
+  template:
+    - div:
+        nestingLevel: 3
+        repeat: 3

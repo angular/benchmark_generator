@@ -13,14 +13,18 @@ Component:
 
 main() {
   group('parseGenSpecYaml', () {
+    test('should have application name', () {
+      expect(parseGenSpecYaml('app', simpleSpec).name, 'app');
+    });
+
     test('should extract entrypoint component', () {
-      var spec = parseGenSpecYaml(simpleSpec);
+      var spec = parseGenSpecYaml('app', simpleSpec);
       expect(spec.rootComponent, isNotNull);
       expect(spec.rootComponent.name, 'Component');
     });
 
     test('should extract trivial PlainNodeGenSpec', () {
-      var spec = parseGenSpecYaml(simpleSpec).components['Component'];
+      var spec = parseGenSpecYaml('app', simpleSpec).components['Component'];
       expect(spec.name, 'Component');
       expect(spec.template.length, 1);
       expect(spec.template[0], new isInstanceOf<NodeInstanceGenSpec>());
@@ -44,7 +48,7 @@ Parent:
         repeat: 20
 ''';
 
-          var spec = parseGenSpecYaml(specFile).components['Parent'];
+          var spec = parseGenSpecYaml('app', specFile).components['Parent'];
           expect(spec.template.single.ref.runtimeType, nodeType[1]);
         });
 
@@ -58,7 +62,7 @@ RepeatedDiv:
         repeat: 20
 ''';
 
-          var spec = parseGenSpecYaml(specFile).components['RepeatedDiv'];
+          var spec = parseGenSpecYaml('app', specFile).components['RepeatedDiv'];
           expect(spec.template.single.timesToRepeatNode, 20);
         });
 
@@ -72,7 +76,7 @@ NestedDiv:
         nestingLevel: 4
 ''';
 
-          var spec = parseGenSpecYaml(specFile).components['NestedDiv'];
+          var spec = parseGenSpecYaml('app', specFile).components['NestedDiv'];
           expect(spec.template.single.nestingLevel, 4);
         });
 
@@ -86,7 +90,7 @@ IfBranch:
         branch: if
 ''';
 
-          var spec = parseGenSpecYaml(specFile).components['IfBranch'];
+          var spec = parseGenSpecYaml('app', specFile).components['IfBranch'];
           expect(spec.template.single.branchSpec, new isInstanceOf<IfBranchSpec>());
         });
 
@@ -100,7 +104,7 @@ Props:
         props: 6
 ''';
 
-          var spec = parseGenSpecYaml(specFile).components['Props'];
+          var spec = parseGenSpecYaml('app', specFile).components['Props'];
           expect(spec.template.single.propertyBingingCount, 6);
         });
       });

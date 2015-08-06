@@ -39,9 +39,9 @@ transformers:
 <html>
   <title>Generated app: ${_genSpec.name}</title>
 <body>
-  <gen-app>
+  <${_genSpec.rootComponent.name}>
     Loading...
-  </gen-app>
+  </${_genSpec.rootComponent.name}>
 
   <script src="index.dart" type="application/dart"></script>
   <script src="packages/browser/dart.js" type="text/javascript"></script>
@@ -69,16 +69,27 @@ main() {
   }
 
   void _generateComponentDartFile(ComponentGenSpec compSpec) {
+    final directiveImports = <String>[];
+    final directives = <String>[];
+    compSpec.template
+      .where((NodeInstanceGenSpec nodeSpec) => nodeSpec.ref is ComponentGenSpec)
+      .forEach((NodeInstanceGenSpec nodeSpec) {
+        final childComponent = nodeSpec.nodeName;
+        directives.add(childComponent);
+        directiveImports.add("import '${childComponent}.dart';\n");
+      });
+
     _fs.addFile('lib/${compSpec.name}.dart', '''
 library ${_genSpec.name}.${compSpec.name};
 
 import 'package:angular2/angular2.dart';
-
+${directiveImports.join('')}
 @Component(
   selector: '${compSpec.name}'
 )
 @View(
   templateUrl: '${compSpec.name}.html'
+${directives.isNotEmpty ? '  , directives: const ${directives}' : ''}
 )
 class ${compSpec.name} {
 }

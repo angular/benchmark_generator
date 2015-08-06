@@ -48,9 +48,9 @@ transformers:
 <html>
   <title>Generated app: app</title>
 <body>
-  <gen-app>
+  <Component>
     Loading...
-  </gen-app>
+  </Component>
 
   <script src="index.dart" type="application/dart"></script>
   <script src="packages/browser/dart.js" type="text/javascript"></script>
@@ -85,6 +85,7 @@ import 'package:angular2/angular2.dart';
 )
 @View(
   templateUrl: 'Component.html'
+
 )
 class Component {
 }
@@ -95,6 +96,43 @@ class Component {
       generate(simpleSpec);
       expect(app.getFile('lib/Component.html').contents, '''
 <div></div>''');
+    });
+
+    test('should list directives', () {
+      generate('''
+entrypoint: Parent
+
+Parent:
+  template:
+    - Child1
+    - Child2
+
+Child1:
+  template:
+    - div
+
+Child2:
+  template:
+    - div
+''');
+
+      expect(app.getFile('lib/Parent.dart').contents, '''
+library app.Parent;
+
+import 'package:angular2/angular2.dart';
+import 'Child1.dart';
+import 'Child2.dart';
+
+@Component(
+  selector: 'Parent'
+)
+@View(
+  templateUrl: 'Parent.html'
+  , directives: const [Child1, Child2]
+)
+class Parent {
+}
+''');
     });
   });
 }

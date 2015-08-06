@@ -32,10 +32,10 @@ dependencies:
   browser: any
 transformers:
 - angular2:
-  entrypoints:
-    - web/index.dart
-  reflection_entrypoints:
-    - web/index.dart
+    entry_points:
+      - web/index.dart
+    reflection_entry_points:
+      - web/index.dart
 - \$dart2js:
     minify: true
 ''');

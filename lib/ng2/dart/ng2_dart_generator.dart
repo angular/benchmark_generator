@@ -1,6 +1,6 @@
-library web_app_generator.ng2_dart_generator;
+library benchmark_generator.ng2_dart_generator;
 
-import 'package:web_app_generator/generator.dart';
+import 'package:benchmark_generator/generator.dart';
 
 class Ng2DartGenerator implements Generator {
   final _fs = new VFileSystem();

@@ -1,7 +1,7 @@
-library web_app_generator.vfs.test;
+library benchmark_generator.vfs.test;
 
 import 'package:test/test.dart';
-import 'package:web_app_generator/generator.dart';
+import 'package:benchmark_generator/generator.dart';
 
 main() {
   group('VFile', () {

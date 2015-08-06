@@ -1,4 +1,4 @@
-name: web_app_generator
+name: benchmark_generator
 version: 0.0.1
 description: >
   Use it to generate identical applications for different frameworks or
@@ -6,7 +6,7 @@ description: >
   such as code size, runtime performance, etc.
 authors:
 - Yegor Jbanov <yjbanov@google.com>
-homepage: https://github.com/angular/web_app_generator
+homepage: https://github.com/angular/benchmark_generator
 environment:
   sdk: '>=1.11.1'
 dependencies:

@@ -3,8 +3,8 @@ library app_generator.generate;
 import 'dart:io';
 import 'package:args/args.dart';
 import 'package:path/path.dart' as path;
-import 'package:web_app_generator/ng2/dart/ng2_dart_generator.dart';
-import 'package:web_app_generator/generator.dart';
+import 'package:benchmark_generator/ng2/dart/ng2_dart_generator.dart';
+import 'package:benchmark_generator/generator.dart';
 
 main(List<String> rawArgs) {
   final args = _parseArgs(rawArgs);

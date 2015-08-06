@@ -1,8 +1,8 @@
-library web_app_generator.ng2_dart_generator.test;
+library benchmark_generator.ng2_dart_generator.test;
 
 import 'package:test/test.dart';
-import 'package:web_app_generator/generator.dart';
-import 'package:web_app_generator/ng2/dart/ng2_dart_generator.dart';
+import 'package:benchmark_generator/generator.dart';
+import 'package:benchmark_generator/ng2/dart/ng2_dart_generator.dart';
 
 const simpleSpec = '''
 entrypoint: Component

@@ -43,6 +43,9 @@ transformers:
     Loading...
   </${_genSpec.rootComponent.name}>
 
+  <script type="text/javascript">
+    console.timeStamp('>>> pre-script');
+  </script>
   <script src="index.dart" type="application/dart"></script>
   <script src="packages/browser/dart.js" type="text/javascript"></script>
 </body>
@@ -54,11 +57,14 @@ transformers:
     _fs.addFile('web/index.dart', '''
 library ${_genSpec.name};
 
+import 'dart:html';
 import 'package:angular2/bootstrap.dart';
 import 'package:${_genSpec.name}/${_genSpec.rootComponent.name}.dart';
 
-main() {
-  bootstrap(${_genSpec.rootComponent.name});
+main() async {
+  window.console.timeStamp('>>> before bootstrap');
+  await bootstrap(${_genSpec.rootComponent.name});
+  window.console.timeStamp('>>> after bootstrap');
 }
 ''');
   }

@@ -1,0 +1,6 @@
+entrypoint: HelloWorld
+
+HelloWorld:
+  template:
+    - div:
+        props: 1

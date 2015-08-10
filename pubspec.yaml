@@ -19,3 +19,5 @@ dev_dependencies:
   test: '^0.12.3'
 dependency_overrides:
   collection: '^1.1.1'
+executables:
+  bench_gen: generate

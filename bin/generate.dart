@@ -16,7 +16,7 @@ main(List<String> rawArgs) {
 
   Generator generator = null;
   switch(framework) {
-    case 'ng2':
+    case 'ng2-dart':
       generator = new Ng2DartGenerator();
       break;
     default:

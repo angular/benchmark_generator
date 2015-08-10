@@ -52,6 +52,9 @@ transformers:
     Loading...
   </Component>
 
+  <script type="text/javascript">
+    console.timeStamp('>>> pre-script');
+  </script>
   <script src="index.dart" type="application/dart"></script>
   <script src="packages/browser/dart.js" type="text/javascript"></script>
 </body>
@@ -64,11 +67,14 @@ transformers:
       expect(app.getFile('web/index.dart').contents, '''
 library app;
 
+import 'dart:html';
 import 'package:angular2/bootstrap.dart';
 import 'package:app/Component.dart';
 
-main() {
-  bootstrap(Component);
+main() async {
+  window.console.timeStamp('>>> before bootstrap');
+  await bootstrap(Component);
+  window.console.timeStamp('>>> after bootstrap');
 }
 ''');
     });

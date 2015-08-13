@@ -107,7 +107,22 @@ Props:
           var spec = parseGenSpecYaml('app', specFile).components['Props'];
           expect(spec.template.single.propertyBingingCount, 6);
         });
-      });
+
+        test('should extract "repeat" branches', () {
+          var specFile = '''
+${simpleSpec}
+
+RepeatBranch:
+  template:
+    - ${nodeType[0]}:
+        branch:
+          repeat: 10
+''';
+
+          var spec = parseGenSpecYaml('app', specFile).components['RepeatBranch'];
+          expect(spec.template.single.branchSpec, new isInstanceOf<RepeatBranchSpec>());
+        });
       });
     });
+  });
 }

@@ -256,5 +256,42 @@ class BranchIf {
       expectCode('lib/BranchIf.html', '''
 <Child *ng-if="branch0"></Child>''');
     });
+
+    test('should generate ng-for', () {
+      generate('''
+entrypoint: BranchRepeat
+
+BranchRepeat:
+  template:
+    - Child:
+        branch:
+          repeat: 10
+
+Child:
+  template:
+    - div
+''');
+
+      expectCode('lib/BranchRepeat.dart', '''
+library app.BranchRepeat;
+
+import 'package:angular2/angular2.dart';
+import 'Child.dart';
+
+@Component(
+  selector: 'BranchRepeat'
+)
+@View(
+  templateUrl: 'BranchRepeat.html'
+  , directives: const [Child]
+)
+class BranchRepeat {
+  var branch0;
+}
+''');
+
+      expectCode('lib/BranchRepeat.html', '''
+<Child *ng-for="#item of branch0"></Child>''');
+    });
   });
 }

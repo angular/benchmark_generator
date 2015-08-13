@@ -141,7 +141,7 @@ ${branchProps}
         branch.write(' *ng-if="branch${branchIndex++}"');
       } else if (nodeSpec.branchSpec is RepeatBranchSpec) {
         RepeatBranchSpec repeatBranch = nodeSpec.branchSpec;
-        branch.write(' *ng-repeat="branch${branchIndex++}"');
+        branch.write(' *ng-for="#item of branch${branchIndex++}"');
       }
       return '<${nodeSpec.nodeName}${bindings}${branch}></${nodeSpec.nodeName}>';
     }).join('\n');

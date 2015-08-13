@@ -104,7 +104,6 @@ import 'package:angular2/angular2.dart';
 )
 @View(
   templateUrl: 'Component.html'
-
 )
 class Component {
 }
@@ -174,7 +173,6 @@ import 'package:angular2/angular2.dart';
 )
 @View(
   templateUrl: 'WithBindings.html'
-
 )
 class WithBindings {
   var prop0;

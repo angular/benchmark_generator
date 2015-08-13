@@ -15,8 +15,12 @@ class Ng2DartGenerator implements Generator {
     return _fs;
   }
 
+  _addFile(String path, String contents) {
+    _fs.addFile(path, contents);
+  }
+
   void _generatePubspec() {
-    _fs.addFile('pubspec.yaml', '''
+    _addFile('pubspec.yaml', '''
 name: ${_genSpec.name}
 version: 0.0.0
 dependencies:
@@ -30,11 +34,12 @@ transformers:
       - web/index.dart
 - \$dart2js:
     minify: true
+    commandLineOptions: [--trust-type-annotations,--trust-primitives]
 ''');
   }
 
   void _generateIndexHtml() {
-    _fs.addFile('web/index.html', '''
+    _addFile('web/index.html', '''
 <!doctype html>
 <html>
   <title>Generated app: ${_genSpec.name}</title>
@@ -54,7 +59,7 @@ transformers:
   }
 
   void _generateIndexDart() {
-    _fs.addFile('web/index.dart', '''
+    _addFile('web/index.dart', '''
 library ${_genSpec.name};
 
 import 'dart:html';
@@ -94,7 +99,15 @@ main() async {
     props.write(new List.generate(totalProps, (i) => '  var prop${i};')
         .join('\n'));
 
-    _fs.addFile('lib/${compSpec.name}.dart', '''
+    final branchProps = new StringBuffer();
+    int i = 0;
+    compSpec.template.forEach((NodeInstanceGenSpec nodeSpec) {
+      if (nodeSpec.branchSpec != null) {
+        branchProps.write('  var branch${i++};');
+      }
+    });
+
+    _addFile('lib/${compSpec.name}.dart', '''
 library ${_genSpec.name}.${compSpec.name};
 
 import 'package:angular2/angular2.dart';
@@ -106,12 +119,15 @@ ${directiveImports.join('')}
   templateUrl: '${compSpec.name}.html'
 ${directives.isNotEmpty ? '  , directives: const ${directives}' : ''}
 )
-class ${compSpec.name} {${props}
+class ${compSpec.name} {
+${props}
+${branchProps}
 }
 ''');
   }
 
   void _generateComponentTemplateFile(ComponentGenSpec compSpec) {
+    int branchIndex = 0;
     var template = compSpec.template.map((NodeInstanceGenSpec nodeSpec) {
       final bindings = new StringBuffer();
       if (nodeSpec.propertyBingingCount > 0) {
@@ -119,8 +135,16 @@ class ${compSpec.name} {${props}
         bindings.write(new List.generate(nodeSpec.propertyBingingCount, (i) => '[prop${i}]="prop${i}"')
             .join(' '));
       }
-      return '<${nodeSpec.nodeName}${bindings}></${nodeSpec.nodeName}>';
+      final branch = new StringBuffer();
+      if (nodeSpec.branchSpec is IfBranchSpec) {
+        IfBranchSpec ifBranch = nodeSpec.branchSpec;
+        branch.write(' *ng-if="branch${branchIndex++}"');
+      } else if (nodeSpec.branchSpec is RepeatBranchSpec) {
+        RepeatBranchSpec repeatBranch = nodeSpec.branchSpec;
+        branch.write(' *ng-repeat="branch${branchIndex++}"');
+      }
+      return '<${nodeSpec.nodeName}${bindings}${branch}></${nodeSpec.nodeName}>';
     }).join('\n');
-    _fs.addFile('lib/${compSpec.name}.html', template);
+    _addFile('lib/${compSpec.name}.html', template);
   }
 }

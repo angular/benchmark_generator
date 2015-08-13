@@ -40,9 +40,21 @@ _emitFiles(VFileSystem vfs, Directory outputDir) {
 
 ArgResults _parseArgs(List<String> rawArgs) {
   final parser = new ArgParser()
-    ..addOption('input', abbr: 'i')
-    ..addOption('output', abbr: 'o')
-    ..addOption('framework', abbr: 'f');
+    ..addOption('input', abbr: 'i', callback: (val) {
+      if (val == null || val.isEmpty) {
+        throw '--input (-i) required: app descriptor file';
+      }
+    })
+    ..addOption('output', abbr: 'o', callback: (val) {
+      if (val == null || val.isEmpty) {
+        throw '--output (-o) required: output directory';
+      }
+    })
+    ..addOption('framework', abbr: 'f', callback: (val) {
+      if (val == null || val.isEmpty) {
+        throw '--framework (-f) required: framework (ng2-dart)';
+      }
+    });
 
   return parser.parse(rawArgs);
 }

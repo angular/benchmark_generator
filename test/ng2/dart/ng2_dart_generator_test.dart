@@ -22,9 +22,21 @@ main() {
       app = new Ng2DartGenerator().generate(spec);
     }
 
+    void expectCode(String path, String code) {
+      final expectedTrimmed = code
+          .split('\n')
+          .where((String line) => line.trim().isNotEmpty)
+          .join('\n');
+      final actualTrimmed = app.getFile(path).contents
+          .split('\n')
+          .where((String line) => line.trim().isNotEmpty)
+          .join('\n');
+      expect(actualTrimmed, expectedTrimmed);
+    }
+
     test('should generate pubspec.yaml', () {
       generate(simpleSpec);
-      expect(app.getFile('pubspec.yaml').contents, '''
+      expectCode('pubspec.yaml', '''
 name: app
 version: 0.0.0
 dependencies:
@@ -38,12 +50,13 @@ transformers:
       - web/index.dart
 - \$dart2js:
     minify: true
+    commandLineOptions: [--trust-type-annotations,--trust-primitives]
 ''');
     });
 
     test('should generate index.html', () {
       generate(simpleSpec);
-      expect(app.getFile('web/index.html').contents, '''
+      expectCode('web/index.html', '''
 <!doctype html>
 <html>
   <title>Generated app: app</title>
@@ -64,7 +77,7 @@ transformers:
 
     test('should generate index.dart', () {
       generate(simpleSpec);
-      expect(app.getFile('web/index.dart').contents, '''
+      expectCode('web/index.dart', '''
 library app;
 
 import 'dart:html';
@@ -81,7 +94,7 @@ main() async {
 
     test('should generate Dart code for component', () {
       generate(simpleSpec);
-      expect(app.getFile('lib/Component.dart').contents, '''
+      expectCode('lib/Component.dart', '''
 library app.Component;
 
 import 'package:angular2/angular2.dart';
@@ -100,7 +113,7 @@ class Component {
 
     test('should generate template code for component', () {
       generate(simpleSpec);
-      expect(app.getFile('lib/Component.html').contents, '''
+      expectCode('lib/Component.html', '''
 <div></div>''');
     });
 
@@ -122,7 +135,7 @@ Child2:
     - div
 ''');
 
-      expect(app.getFile('lib/Parent.dart').contents, '''
+      expectCode('lib/Parent.dart', '''
 library app.Parent;
 
 import 'package:angular2/angular2.dart';
@@ -151,7 +164,7 @@ WithBindings:
         props: 2
 ''');
 
-      expect(app.getFile('lib/WithBindings.dart').contents, '''
+      expectCode('lib/WithBindings.dart', '''
 library app.WithBindings;
 
 import 'package:angular2/angular2.dart';
@@ -169,7 +182,7 @@ class WithBindings {
 }
 ''');
 
-      expect(app.getFile('lib/WithBindings.html').contents, '''
+      expectCode('lib/WithBindings.html', '''
 <div [prop0]="prop0" [prop1]="prop1"></div>''');
     });
 
@@ -187,7 +200,7 @@ Child:
     - div
 ''');
 
-      expect(app.getFile('lib/WithBindings.dart').contents, '''
+      expectCode('lib/WithBindings.dart', '''
 library app.WithBindings;
 
 import 'package:angular2/angular2.dart';
@@ -206,8 +219,44 @@ class WithBindings {
 }
 ''');
 
-      expect(app.getFile('lib/WithBindings.html').contents, '''
+      expectCode('lib/WithBindings.html', '''
 <Child [prop0]="prop0" [prop1]="prop1"></Child>''');
+    });
+
+    test('should generate ng-if', () {
+      generate('''
+entrypoint: BranchIf
+
+BranchIf:
+  template:
+    - Child:
+        branch: if
+
+Child:
+  template:
+    - div
+''');
+
+      expectCode('lib/BranchIf.dart', '''
+library app.BranchIf;
+
+import 'package:angular2/angular2.dart';
+import 'Child.dart';
+
+@Component(
+  selector: 'BranchIf'
+)
+@View(
+  templateUrl: 'BranchIf.html'
+  , directives: const [Child]
+)
+class BranchIf {
+  var branch0;
+}
+''');
+
+      expectCode('lib/BranchIf.html', '''
+<Child *ng-if="branch0"></Child>''');
     });
   });
 }

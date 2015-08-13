@@ -77,13 +77,22 @@ main() async {
   void _generateComponentDartFile(ComponentGenSpec compSpec) {
     final directiveImports = <String>[];
     final directives = <String>[];
+    int totalProps = 0;
     compSpec.template
+      .map((NodeInstanceGenSpec nodeSpec) {
+        totalProps += nodeSpec.propertyBingingCount;
+        return nodeSpec;
+      })
       .where((NodeInstanceGenSpec nodeSpec) => nodeSpec.ref is ComponentGenSpec)
       .forEach((NodeInstanceGenSpec nodeSpec) {
         final childComponent = nodeSpec.nodeName;
         directives.add(childComponent);
         directiveImports.add("import '${childComponent}.dart';\n");
       });
+
+    final props = new StringBuffer('\n');
+    props.write(new List.generate(totalProps, (i) => '  var prop${i};')
+        .join('\n'));
 
     _fs.addFile('lib/${compSpec.name}.dart', '''
 library ${_genSpec.name}.${compSpec.name};
@@ -97,14 +106,20 @@ ${directiveImports.join('')}
   templateUrl: '${compSpec.name}.html'
 ${directives.isNotEmpty ? '  , directives: const ${directives}' : ''}
 )
-class ${compSpec.name} {
+class ${compSpec.name} {${props}
 }
 ''');
   }
 
   void _generateComponentTemplateFile(ComponentGenSpec compSpec) {
     var template = compSpec.template.map((NodeInstanceGenSpec nodeSpec) {
-      return '<${nodeSpec.nodeName}></${nodeSpec.nodeName}>';
+      final bindings = new StringBuffer();
+      if (nodeSpec.propertyBingingCount > 0) {
+        bindings.write(' ');
+        bindings.write(new List.generate(nodeSpec.propertyBingingCount, (i) => '[prop${i}]="prop${i}"')
+            .join(' '));
+      }
+      return '<${nodeSpec.nodeName}${bindings}></${nodeSpec.nodeName}>';
     }).join('\n');
     _fs.addFile('lib/${compSpec.name}.html', template);
   }

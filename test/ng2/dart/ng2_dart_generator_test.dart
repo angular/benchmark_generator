@@ -140,5 +140,74 @@ class Parent {
 }
 ''');
     });
+
+    test('should generate property bindings on plain nodes', () {
+      generate('''
+entrypoint: WithBindings
+
+WithBindings:
+  template:
+    - div:
+        props: 2
+''');
+
+      expect(app.getFile('lib/WithBindings.dart').contents, '''
+library app.WithBindings;
+
+import 'package:angular2/angular2.dart';
+
+@Component(
+  selector: 'WithBindings'
+)
+@View(
+  templateUrl: 'WithBindings.html'
+
+)
+class WithBindings {
+  var prop0;
+  var prop1;
+}
+''');
+
+      expect(app.getFile('lib/WithBindings.html').contents, '''
+<div [prop0]="prop0" [prop1]="prop1"></div>''');
+    });
+
+    test('should generate property bindings on child components', () {
+      generate('''
+entrypoint: WithBindings
+
+WithBindings:
+  template:
+    - Child:
+        props: 2
+
+Child:
+  template:
+    - div
+''');
+
+      expect(app.getFile('lib/WithBindings.dart').contents, '''
+library app.WithBindings;
+
+import 'package:angular2/angular2.dart';
+import 'Child.dart';
+
+@Component(
+  selector: 'WithBindings'
+)
+@View(
+  templateUrl: 'WithBindings.html'
+  , directives: const [Child]
+)
+class WithBindings {
+  var prop0;
+  var prop1;
+}
+''');
+
+      expect(app.getFile('lib/WithBindings.html').contents, '''
+<Child [prop0]="prop0" [prop1]="prop1"></Child>''');
+    });
   });
 }

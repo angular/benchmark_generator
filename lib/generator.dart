@@ -1,4 +1,4 @@
-library app_generator;
+library benchmark_generator;
 
 import 'dart:convert';
 import 'package:boilerplate/boilerplate.dart';

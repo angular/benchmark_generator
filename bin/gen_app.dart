@@ -1,4 +1,4 @@
-library app_generator.generate;
+library benchmark_generator.gen_app;
 
 import 'dart:io';
 import 'package:args/args.dart';
@@ -56,5 +56,12 @@ ArgResults _parseArgs(List<String> rawArgs) {
       }
     });
 
-  return parser.parse(rawArgs);
+  try {
+    return parser.parse(rawArgs);
+  } catch (e) {
+    print('Bad arguments: ${e}\n');
+    print('Usage:\n');
+    print(parser.usage);
+    throw '';
+  }
 }

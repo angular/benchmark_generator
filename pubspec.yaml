@@ -1,5 +1,5 @@
 name: benchmark_generator
-version: 0.0.1
+version: 0.0.2
 description: >
   Use it to generate identical applications for different frameworks or
   different versions of the same framework to compare various characteristics

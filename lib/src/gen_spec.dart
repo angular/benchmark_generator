@@ -21,7 +21,6 @@ class PlainNodeGenSpec extends NodeGenSpec with Boilerplate {}
 class NodeInstanceGenSpec extends Object with Boilerplate {
   String nodeName;
   NodeGenSpec ref;
-  int nestingLevel = 0;
   BranchSpec branchSpec = null;
   int propertyBingingCount = 0;
   int timesToRepeatNode = 1;
@@ -110,7 +109,6 @@ NodeInstanceGenSpec _parseNodeInstanceGenSpec(specYaml) {
     final data = specYaml.values.single;
     return new NodeInstanceGenSpec()
       ..nodeName = name
-      ..nestingLevel = firstNonNull(data['nestingLevel'], 0)
       ..propertyBingingCount = firstNonNull(data['props'], 0)
       ..timesToRepeatNode = firstNonNull(data['repeat'], 0)
       ..branchSpec = _parseBranchSpec(data['branch']);

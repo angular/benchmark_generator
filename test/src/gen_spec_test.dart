@@ -66,20 +66,6 @@ RepeatedDiv:
           expect(spec.template.single.timesToRepeatNode, 20);
         });
 
-        test('should extract nestingLevel', () {
-          var specFile = '''
-${simpleSpec}
-
-NestedDiv:
-  template:
-    - ${nodeType[0]}:
-        nestingLevel: 4
-''';
-
-          var spec = parseGenSpecYaml('app', specFile).components['NestedDiv'];
-          expect(spec.template.single.nestingLevel, 4);
-        });
-
         test('should extract "if" branches', () {
           var specFile = '''
 ${simpleSpec}

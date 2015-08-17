@@ -4,14 +4,11 @@ entrypoint: Shell
 Shell:
   template:
     - Screen1:
-        # nestingLevel indicates how many levels deep a node should appear
-        nestingLevel: 3
         # whether the node is guarded by a conditional
         branch: if
         # the number of property bindings on this node
         props: 3
     - Screen2:
-        nestingLevel: 3
         branch: if
         props: 1
 
@@ -30,12 +27,10 @@ Screen2:
     - ScreenHeader:
         props: 5
     - div:
-        nestingLevel: 3
         branch:
           repeat: 10
 
 ScreenHeader:
   template:
     - div:
-        nestingLevel: 3
         repeat: 3

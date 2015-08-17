@@ -77,6 +77,7 @@ main() async {
   void _generateComponentFiles(ComponentGenSpec compSpec) {
     _generateComponentDartFile(compSpec);
     _generateComponentTemplateFile(compSpec);
+    _generatePrecompiledTemplateFile(compSpec);
   }
 
   void _generateComponentDartFile(ComponentGenSpec compSpec) {
@@ -160,5 +161,62 @@ ${textProps}
       return '<${nodeSpec.nodeName}${bindings}${branch}>${textBindings}</${nodeSpec.nodeName}>';
     }).join('\n');
     _addFile('lib/${compSpec.name}.html', template);
+  }
+
+  void _generatePrecompiledTemplateFile(ComponentGenSpec compSpec) {
+    int branchIndex = 0;
+    final buf = new StringBuffer();
+
+    List<String> directiveImports = [];
+    compSpec.template
+        .where((node) => node.ref is ComponentGenSpec)
+        .map((node) => node.nodeName)
+        .forEach(directiveImports.add);
+
+    buf.write('''
+library ${compSpec.name}.precompiled.template;
+
+import 'package:angular2/angular2.dart';
+import 'package:angular2/src/core/compiler/template_factory.dart' as _tf_;
+${directiveImports.map((d) => "import '${d}.dart'").join(';\n')}
+
+const styles = const [];
+
+final commands = [
+''');
+
+    compSpec.template.forEach((NodeInstanceGenSpec nodeSpec) {
+      bool isBound =
+          nodeSpec.branchSpec != null ||
+          nodeSpec.ref is ComponentGenSpec ||
+          nodeSpec.propertyBingingCount > 0;
+      final beginCommand = nodeSpec.ref is ComponentGenSpec
+          ? 'bc'  // child component
+          : 'be';  // plain HTML element
+
+      // TODO: how does one specify property bindings?
+      buf.write('  _tf_.${beginCommand}(');
+      buf.write("name: '${nodeSpec.nodeName}'");
+      buf.write(', bound: ${isBound}');
+
+      final directives = <String>[];
+      if (beginCommand == 'bc') {
+        buf.write(', nativeShadowDom: false');
+        directives.add(nodeSpec.nodeName);
+      }
+
+      if (nodeSpec.branchSpec is IfBranchSpec) {
+        directives.add('NgIf');
+      } else if (nodeSpec.branchSpec is RepeatBranchSpec) {
+        directives.add('NgFor');
+      }
+
+      buf.write(', directives: const ${directives}');
+      buf.writeln('),');
+    });
+
+    buf.writeln('];');
+
+    _addFile('lib/${compSpec.name}.precompiled.dart', buf.toString());
   }
 }

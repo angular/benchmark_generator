@@ -94,6 +94,20 @@ Props:
           expect(spec.template.single.propertyBindingCount, 6);
         });
 
+        test('should extract text bindings ("textBindings")', () {
+          var specFile = '''
+${simpleSpec}
+
+TextBindings:
+  template:
+    - ${nodeType[0]}:
+        textBindings: 7
+''';
+
+          var spec = parseGenSpecYaml('app', specFile).components['TextBindings'];
+          expect(spec.template.single.textBindingCount, 7);
+        });
+
         test('should extract "repeat" branches', () {
           var specFile = '''
 ${simpleSpec}

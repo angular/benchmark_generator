@@ -23,6 +23,7 @@ class NodeInstanceGenSpec extends Object with Boilerplate {
   NodeGenSpec ref;
   BranchSpec branchSpec = null;
   int propertyBindingCount = 0;
+  int textBindingCount = 0;
   int timesToRepeatNode = 1;
 }
 
@@ -110,6 +111,7 @@ NodeInstanceGenSpec _parseNodeInstanceGenSpec(specYaml) {
     return new NodeInstanceGenSpec()
       ..nodeName = name
       ..propertyBindingCount = firstNonNull(data['props'], 0)
+      ..textBindingCount = firstNonNull(data['textBindings'], 0)
       ..timesToRepeatNode = firstNonNull(data['repeat'], 0)
       ..branchSpec = _parseBranchSpec(data['branch']);
   }

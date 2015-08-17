@@ -83,9 +83,11 @@ main() async {
     final directiveImports = <String>[];
     final directives = <String>[];
     int totalProps = 0;
+    int totalTextProps = 0;
     compSpec.template
       .map((NodeInstanceGenSpec nodeSpec) {
         totalProps += nodeSpec.propertyBindingCount;
+        totalTextProps += nodeSpec.textBindingCount;
         return nodeSpec;
       })
       .where((NodeInstanceGenSpec nodeSpec) => nodeSpec.ref is ComponentGenSpec)
@@ -97,6 +99,10 @@ main() async {
 
     final props = new StringBuffer('\n');
     props.write(new List.generate(totalProps, (i) => '  var prop${i};')
+        .join('\n'));
+
+    final textProps = new StringBuffer('\n');
+    textProps.write(new List.generate(totalTextProps, (i) => '  var text${i};')
         .join('\n'));
 
     final branchProps = new StringBuffer();
@@ -122,12 +128,15 @@ ${directives.isNotEmpty ? '  , directives: const ${directives}' : ''}
 class ${compSpec.name} {
 ${props}
 ${branchProps}
+${textProps}
 }
 ''');
   }
 
   void _generateComponentTemplateFile(ComponentGenSpec compSpec) {
     int branchIndex = 0;
+    int propIdx = 0;
+    int textIdx = 0;
     var template = compSpec.template.map((NodeInstanceGenSpec nodeSpec) {
       final bindings = new StringBuffer();
       if (nodeSpec.propertyBindingCount > 0) {
@@ -143,7 +152,12 @@ ${branchProps}
         RepeatBranchSpec repeatBranch = nodeSpec.branchSpec;
         branch.write(' *ng-for="#item of branch${branchIndex++}"');
       }
-      return '<${nodeSpec.nodeName}${bindings}${branch}></${nodeSpec.nodeName}>';
+
+      final textBindings = new List.generate(nodeSpec.textBindingCount, (_) {
+        return '{{text${textIdx++}}}';
+      }).join();
+
+      return '<${nodeSpec.nodeName}${bindings}${branch}>${textBindings}</${nodeSpec.nodeName}>';
     }).join('\n');
     _addFile('lib/${compSpec.name}.html', template);
   }

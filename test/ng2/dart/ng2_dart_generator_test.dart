@@ -184,6 +184,37 @@ class WithBindings {
 <div [prop0]="prop0" [prop1]="prop1"></div>''');
     });
 
+    test('should generate text bindings on plain nodes', () {
+      generate('''
+entrypoint: WithBindings
+
+WithBindings:
+  template:
+    - div:
+        textBindings: 2
+''');
+
+      expectCode('lib/WithBindings.dart', '''
+library app.WithBindings;
+
+import 'package:angular2/angular2.dart';
+
+@Component(
+  selector: 'WithBindings'
+)
+@View(
+  templateUrl: 'WithBindings.html'
+)
+class WithBindings {
+  var text0;
+  var text1;
+}
+''');
+
+      expectCode('lib/WithBindings.html', '''
+<div>{{text0}}{{text1}}</div>''');
+    });
+
     test('should generate property bindings on child components', () {
       generate('''
 entrypoint: WithBindings

@@ -74,6 +74,8 @@ ${cmpName}:
   template:
     - div:
         props: 1
+    - div:
+        textBindings: 1
 ${_generateChildren(branchingFactor, level + 1).map(childComponent).join('\n')}
 ${_generateChildren(conditionalBranchingFactor, level + 1).map(conditionalChildComponent).join('\n')}
 ''');

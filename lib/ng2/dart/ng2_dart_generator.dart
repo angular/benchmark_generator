@@ -85,7 +85,7 @@ main() async {
     int totalProps = 0;
     compSpec.template
       .map((NodeInstanceGenSpec nodeSpec) {
-        totalProps += nodeSpec.propertyBingingCount;
+        totalProps += nodeSpec.propertyBindingCount;
         return nodeSpec;
       })
       .where((NodeInstanceGenSpec nodeSpec) => nodeSpec.ref is ComponentGenSpec)
@@ -130,9 +130,9 @@ ${branchProps}
     int branchIndex = 0;
     var template = compSpec.template.map((NodeInstanceGenSpec nodeSpec) {
       final bindings = new StringBuffer();
-      if (nodeSpec.propertyBingingCount > 0) {
+      if (nodeSpec.propertyBindingCount > 0) {
         bindings.write(' ');
-        bindings.write(new List.generate(nodeSpec.propertyBingingCount, (i) => '[prop${i}]="prop${i}"')
+        bindings.write(new List.generate(nodeSpec.propertyBindingCount, (i) => '[prop${i}]="prop${i}"')
             .join(' '));
       }
       final branch = new StringBuffer();

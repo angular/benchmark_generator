@@ -91,7 +91,7 @@ Props:
 ''';
 
           var spec = parseGenSpecYaml('app', specFile).components['Props'];
-          expect(spec.template.single.propertyBingingCount, 6);
+          expect(spec.template.single.propertyBindingCount, 6);
         });
 
         test('should extract "repeat" branches', () {

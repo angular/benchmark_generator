@@ -10,7 +10,7 @@ class Ng2DartGenerator implements Generator {
     _genSpec = genSpec;
     _generatePubspec();
     _generateIndexHtml();
-    _generateIndexDart();
+    _generateIndexDart(_genSpec.components.keys);
     _genSpec.components.values.forEach(_generateComponentFiles);
     return _fs;
   }
@@ -58,18 +58,46 @@ transformers:
 ''');
   }
 
-  void _generateIndexDart() {
+  void _generateIndexDart(Iterable<String> components) {
+    final precompiledImports = <String>[];
+    final componentImports = <String>[];
+    final templateRegistrations = <String>[];
+    final styleRegistrations = <String>[];
+    components.forEach((String component) {
+      precompiledImports.add('''import 'package:${_genSpec.name}/${component}.precompiled.dart' as _precompiled_${component};''');
+      componentImports.add('''import 'package:${_genSpec.name}/${component}.dart';''');
+      templateRegistrations.add('''    ${component}: _precompiled_${component}.commands''');
+      styleRegistrations.add('''    ${component}: _precompiled_${component}.styles''');
+    });
+
     _addFile('web/index.dart', '''
 library ${_genSpec.name};
 
 import 'dart:html';
 import 'package:angular2/bootstrap.dart';
-import 'package:${_genSpec.name}/${_genSpec.rootComponent.name}.dart';
+${componentImports.join('\n')}
+${precompiledImports.join('\n')}
 
 main() async {
   window.console.timeStamp('>>> before bootstrap');
-  await bootstrap(${_genSpec.rootComponent.name});
+  await bootstrap(${_genSpec.rootComponent.name}, [
+    bind(TemplateRegistry).toValue(_registerTemplates())
+  ]);
   window.console.timeStamp('>>> after bootstrap');
+}
+
+TemplateRegistry _registerTemplates() {
+  var sw = new Stopwatch()..start();
+  window.console.timeStamp('>>> start template registry init');
+  final res = new TemplateRegistry({
+${templateRegistrations.join(',\n')}
+  }, {
+${styleRegistrations.join(',\n')}
+  });
+  window.console.timeStamp('>>> end template registry init');
+  sw.stop();
+  print('>>> registry initialized in \${sw.elapsedMicroseconds} micros');
+  return res;
 }
 ''');
   }
@@ -119,6 +147,7 @@ library ${_genSpec.name}.${compSpec.name};
 
 import 'package:angular2/angular2.dart';
 ${directiveImports.join('')}
+
 @Component(
   selector: '${compSpec.name}'
 )
@@ -178,26 +207,30 @@ library ${compSpec.name}.precompiled.template;
 
 import 'package:angular2/angular2.dart';
 import 'package:angular2/src/core/compiler/template_factory.dart' as _tf_;
-${directiveImports.map((d) => "import '${d}.dart'").join(';\n')}
+${directiveImports.map((d) => "import '${d}.dart';").join('\n')}
 
-const styles = const [];
+const styles = const <String>[];
 
-final commands = [
+final commands = <TemplateCmd>[
 ''');
 
     compSpec.template.forEach((NodeInstanceGenSpec nodeSpec) {
       bool isBound =
           nodeSpec.branchSpec != null ||
           nodeSpec.ref is ComponentGenSpec ||
-          nodeSpec.propertyBingingCount > 0;
+          nodeSpec.propertyBindingCount > 0 ||
+          nodeSpec.textBindingCount > 0;
+
+      // Begin element
       final beginCommand = nodeSpec.ref is ComponentGenSpec
           ? 'bc'  // child component
-          : 'be';  // plain HTML element
+          : isBound   // plain HTML element
+            ? 'bbe'
+            : 'be';
 
       // TODO: how does one specify property bindings?
       buf.write('  _tf_.${beginCommand}(');
       buf.write("name: '${nodeSpec.nodeName}'");
-      buf.write(', bound: ${isBound}');
 
       final directives = <String>[];
       if (beginCommand == 'bc') {
@@ -213,6 +246,9 @@ final commands = [
 
       buf.write(', directives: const ${directives}');
       buf.writeln('),');
+
+      // End element
+      buf.writeln(beginCommand == 'bc' ? '  _tf_.ec(),' : '  _tf_.ee(),');
     });
 
     buf.writeln('];');

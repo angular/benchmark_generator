@@ -19,8 +19,6 @@ Screen1:
         props: 5
     # if node name begins with a small letter, it's a plain HTML element
     - div:
-        # how many times to repeat this node
-        repeat: 20
         # how many text bindings, i.e. {{foo}}, the node contains
         textBindings: 1
 

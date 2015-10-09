@@ -44,26 +44,11 @@ ${simpleSpec}
 
 Parent:
   template:
-    - ${nodeType[0]}:
-        repeat: 20
+    - ${nodeType[0]}
 ''';
 
           var spec = parseGenSpecYaml('app', specFile).components['Parent'];
           expect(spec.template.single.ref.runtimeType, nodeType[1]);
-        });
-
-        test('should extract "repeat" spec', () {
-          var specFile = '''
-${simpleSpec}
-
-RepeatedDiv:
-  template:
-    - ${nodeType[0]}:
-        repeat: 20
-''';
-
-          var spec = parseGenSpecYaml('app', specFile).components['RepeatedDiv'];
-          expect(spec.template.single.timesToRepeatNode, 20);
         });
 
         test('should extract "if" branches', () {

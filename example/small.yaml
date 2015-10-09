@@ -1,3 +1,4 @@
+# The root-level component of the application
 entrypoint: Shell
 
 # "Shell" is both the name of component class and its element

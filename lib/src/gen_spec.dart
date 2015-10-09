@@ -1,5 +1,30 @@
 part of app_generator;
 
+/// Parses [source] YAML that describes an application into a [AppGenSpec],
+/// which can then be used to generate an application for a given framework.
+AppGenSpec parseGenSpecYaml(String appName, String source) {
+  Map specYaml = yaml.loadYaml(source);
+  final appSpec = new AppGenSpec()
+    ..name = appName;
+  String entrypoint = specYaml['entrypoint'];
+  final componentSpecs = <String, ComponentGenSpec>{};
+
+  specYaml
+    .keys
+    .where((k) => k != 'entrypoint')
+    .forEach((k) {
+      componentSpecs[k] = _parseComponentGenSpec(k, specYaml[k]);
+    });
+
+  _resolveRefs(componentSpecs);
+
+  appSpec
+    ..rootComponent = componentSpecs[entrypoint]
+    ..components = componentSpecs;
+
+  return appSpec;
+}
+
 /// Parameters used to generate an application.
 class AppGenSpec extends Object with Boilerplate {
   String name;
@@ -48,29 +73,6 @@ class Node extends Object with Boilerplate {
   String tag;
   Map<String, String> attributes;
   Map<String, String> bindings;
-}
-
-AppGenSpec parseGenSpecYaml(String appName, String source) {
-  Map specYaml = yaml.loadYaml(source);
-  final appSpec = new AppGenSpec()
-    ..name = appName;
-  String entrypoint = specYaml['entrypoint'];
-  final componentSpecs = <String, ComponentGenSpec>{};
-
-  specYaml
-    .keys
-    .where((k) => k != 'entrypoint')
-    .forEach((k) {
-      componentSpecs[k] = _parseComponentGenSpec(k, specYaml[k]);
-    });
-
-  _resolveRefs(componentSpecs);
-
-  appSpec
-    ..rootComponent = componentSpecs[entrypoint]
-    ..components = componentSpecs;
-
-  return appSpec;
 }
 
 void _resolveRefs(Map<String, ComponentGenSpec> components) {

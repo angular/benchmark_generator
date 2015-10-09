@@ -6,6 +6,12 @@ import 'package:path/path.dart' as path;
 import 'package:benchmark_generator/ng2/dart/ng2_dart_generator.dart';
 import 'package:benchmark_generator/generator.dart';
 
+/// Generates an app given an application descriptor YAML file.
+///
+/// A descriptor can either be hand-coded or generated. Hand-coded descriptors
+/// are good for emulating precise application structures. Generated
+/// descriptors are good for load tests, as they can generate larger
+/// application structures that would be prohibitively hard to hand-code.
 main(List<String> rawArgs) {
   final args = _parseArgs(rawArgs);
   final inputFile = new File(args['input']);

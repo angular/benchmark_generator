@@ -1,6 +1,8 @@
 library benchmark_generator;
 
+import 'dart:collection';
 import 'dart:convert';
+import 'dart:math';
 import 'package:boilerplate/boilerplate.dart';
 import 'package:yaml/yaml.dart' as yaml;
 import 'package:quiver/core.dart';

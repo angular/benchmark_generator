@@ -110,4 +110,36 @@ RepeatBranch:
       });
     });
   });
+
+  group('makeTree', () {
+    test('should turn empty list into empty tree', () {
+      expect(makeTree([]), []);
+    });
+
+    test('should nest plain nodes', () {
+      var nodes = new List.generate(5, (i) => i).map((int i) {
+        return new NodeInstanceGenSpec()
+          ..nodeName = 'node${i}'
+          ..ref = new PlainNodeGenSpec();
+      });
+      String _str(NodeInstanceGenSpec node) {
+        return '${node.nodeName}[${node.children.map(_str).join(',')}]';
+      }
+      expect(makeTree(nodes).map(_str).join(','),
+      'node0[node2[],node3[]],node1[node4[]]');
+    });
+
+    test('should not nest component nodes', () {
+      var nodes = new List.generate(5, (i) => i).map((int i) {
+        return new NodeInstanceGenSpec()
+          ..nodeName = 'Node${i}'
+          ..ref = new ComponentGenSpec();
+      });
+      String _str(NodeInstanceGenSpec node) {
+        return '${node.nodeName}[${node.children.map(_str).join(',')}]';
+      }
+      expect(makeTree(nodes).map(_str).join(','),
+          'Node0[],Node1[],Node2[],Node3[],Node4[]');
+    });
+  });
 }

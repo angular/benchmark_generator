@@ -18,6 +18,10 @@ AppGenSpec parseGenSpecYaml(String appName, String source) {
 
   _resolveRefs(componentSpecs);
 
+  componentSpecs.values.forEach((ComponentGenSpec spec) {
+    spec.template = makeTree(spec.template);
+  });
+
   appSpec
     ..rootComponent = componentSpecs[entrypoint]
     ..components = componentSpecs;
@@ -34,16 +38,24 @@ class AppGenSpec extends Object with Boilerplate {
 
 abstract class NodeGenSpec {
   String name;
+  bool get canHaveChildren;
 }
 
 /// Parameters used to generate a component
 class ComponentGenSpec extends NodeGenSpec with Boilerplate {
   List<NodeInstanceGenSpec> template;
+  @override
+  bool get canHaveChildren => false;
 }
 
-class PlainNodeGenSpec extends NodeGenSpec with Boilerplate {}
+class PlainNodeGenSpec extends NodeGenSpec with Boilerplate {
+  @override
+  bool get canHaveChildren => true;
+}
 
 class NodeInstanceGenSpec extends Object with Boilerplate {
+  final children = <NodeInstanceGenSpec>[];
+
   String nodeName;
   NodeGenSpec ref;
   BranchSpec branchSpec = null;
@@ -91,12 +103,38 @@ void _resolveRefs(Map<String, ComponentGenSpec> components) {
 ComponentGenSpec _parseComponentGenSpec(String name, Map specYaml) {
   final spec = new ComponentGenSpec()
     ..name = name;
-  final template = <NodeInstanceGenSpec>[];
+  final flatTemplate = <NodeInstanceGenSpec>[];
   specYaml['template'].forEach((nodeSpec) {
-    template.add(_parseNodeInstanceGenSpec(nodeSpec));
+    flatTemplate.add(_parseNodeInstanceGenSpec(nodeSpec));
   });
-  spec.template = template;
+  spec.template = flatTemplate;
   return spec;
+}
+
+/// Takes a flat list of nodes and nests them to that they form a tree.
+List<NodeInstanceGenSpec> makeTree(List<NodeInstanceGenSpec> flatNodes) {
+  // Add an artificial root node
+  var root = new NodeInstanceGenSpec();
+  flatNodes = [root]..addAll(flatNodes);
+  var branchingFactor = sqrt(flatNodes.length).toInt();
+  var iter = flatNodes.iterator;
+  var q = new Queue();
+  iter.moveNext();
+  q.addFirst(iter.current);
+  while(q.isNotEmpty) {
+    var node = q.removeLast();
+    int childCount = 0;
+    while((q.isEmpty || childCount < branchingFactor) && iter.moveNext()) {
+      var child = iter.current;
+      if (child.ref.canHaveChildren) {
+        q.addFirst(child);
+      }
+      node.children.add(child);
+      childCount++;
+    }
+  }
+
+  return root.children;
 }
 
 NodeInstanceGenSpec _parseNodeInstanceGenSpec(specYaml) {
